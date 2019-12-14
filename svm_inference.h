@@ -32,6 +32,6 @@ typedef struct {
 SVM_MODEL *svm_load(const char *model_file);
 int svm_pred(const SVM_MODEL *svm, const float *feat);
 int svm_pred_ext(const SVM_MODEL *svm, const float *feat, float *prob);
-int vm_free(SVM_MODEL *svm);
+int svm_free(SVM_MODEL *svm);
 
 #endif /* !SVM_INFERENCE_H_ */
