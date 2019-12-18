@@ -32,7 +32,24 @@ Usage
 
 1. export model to binary   
 
+Example iris dataset.
 ```python 
+from sklearn.datasets import load_iris
+import pandas as pd
+from sklearn import svm
+from sklearn.cross_validation import train_test_split
+
+data = load_iris()
+iris = pd.DataFrame(data['data'],columns=[i[:-5] for i in data['feature_names']])
+iris['species'] = pd.Series(np.array(data['target_names'])[data['target']])
+
+train, test = train_test_split(iris, test_size = 0.3)
+
+train_X = train[['sepal length','sepal width','petal length','petal width']]# taking the training data features
+train_y=train.species# output of our training data
+test_X= test[['sepal length','sepal width','petal length','petal width']] # taking test data features
+test_y =test.species   #output value of test data
+
 clf = svm.SVC(kernel='rbf', gamma = 0.05, decision_function_shape='ovo' ) #select the algorithm
 clf.fit(train_X, train_y)
 outputfile = "model.bin"
@@ -81,6 +98,35 @@ def run():
     print("pred: %d" % (res_cls))
 
 run()
+```
+
+```C  
+#include <stdio.h>
+#include <string.h>
+
+#include "svm_inference.h"
+
+const char *class_name[32] = {
+"setosa", "versicolor", "virginica"};
+
+int main(void)
+{
+    float feat[4] = {6.6, 2.9, 4.6, 1.3};
+    const char *model_file = "model.bin";
+    int result_dim;
+    float *result_cls;
+    int cls;
+
+    SVM_MODEL *svm = svm_load(model_file);
+    result_dim = svm->n_cls * (svm->n_cls - 1) / 2;
+    result_cls = malloc(sizeof(float) * result_dim);
+
+    cls = svm_predict_ext(svm, feat, result_cls);
+    printf("predicted class is %s\n", class_name[cls]);
+
+    free(result_cls);
+    svm_free(svm);
+}
 ```
 
 
